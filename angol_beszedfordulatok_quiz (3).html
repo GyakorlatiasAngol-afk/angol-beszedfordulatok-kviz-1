@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angol Beszédfordulatok Kvíz</title>
+<style>
+:root {
+  --blue-dark:#0C447C;
+  --blue-mid:#185FA5;
+  --blue-light:#378ADD;
+  --blue-pale:#E6F1FB;
+  --blue-border:#B5D4F4;
+  --amber:#FAC775;
+  --green-bg:#EAF3DE;
+  --green-border:#639922;
+  --green-text:#27500A;
+  --red-bg:#FCEBEB;
+  --red-border:#E24B4A;
+  --red-text:#791F1F;
+  --gray-bg:#F1EFE8;
+  --gray-border:#D3D1C7;
+  --gray-text:#2C2C2A;
+  --radius-lg:20px;
+  --radius-pill:99px;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+html { font-size:16px; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:linear-gradient(160deg,#e8f2fb 0%,#f5f0ff 100%);
+  min-height:100vh;
+  min-height:100dvh;
+  padding:clamp(1rem,3vw,2rem) clamp(0.75rem,4vw,1.5rem) clamp(2rem,5vw,3rem);
+}
+
+.wrap {
+  max-width:580px;
+  margin:0 auto;
+  width:100%;
+}
+
+/* ── Header ── */
+.top-header {
+  text-align:center;
+  margin-bottom:clamp(1rem,3vw,1.5rem);
+  padding:clamp(1.1rem,3vw,1.5rem) 1rem clamp(1rem,2.5vw,1.25rem);
+  background:#fff;
+  border-radius:var(--radius-lg);
+  border:1px solid var(--blue-border);
+}
+.top-header img {
+  width:clamp(70px,18vw,100px);
+  display:inline-block;
+  height:auto;
+}
+.top-header .sub {
+  font-size:clamp(18px,5vw,24px);
+  color:var(--blue-dark);
+  letter-spacing:0.01em;
+  font-weight:700;
+  margin-top:10px;
+}
+
+/* ── Score bar ── */
+.score-bar {
+  background:var(--blue-mid);
+  border-radius:clamp(14px,3vw,18px);
+  padding:clamp(0.75rem,2.5vw,1rem) clamp(1rem,4vw,1.5rem);
+  margin-bottom:clamp(0.9rem,2.5vw,1.25rem);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+.score-bar .side { display:flex; flex-direction:column; gap:2px; }
+.score-bar .lbl { font-size:clamp(10px,2.5vw,12px); color:#B5D4F4; letter-spacing:0.1em; text-transform:uppercase; }
+.score-bar .val { font-size:clamp(24px,6vw,30px); font-weight:700; color:var(--amber); line-height:1; }
+.score-bar .sub-val { font-size:clamp(10px,2.5vw,12px); color:#B5D4F4; }
+.score-bar .divider { width:1px; height:clamp(30px,8vw,44px); background:rgba(255,255,255,0.2); flex-shrink:0; }
+
+/* ── Progress ── */
+.prog-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:clamp(0.75rem,2vw,1rem);
+}
+.prog-bg { flex:1; height:10px; background:var(--gray-border); border-radius:var(--radius-pill); overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--blue-mid),var(--blue-light)); border-radius:var(--radius-pill); transition:width 0.5s cubic-bezier(.4,0,.2,1); }
+.prog-label { font-size:clamp(11px,2.5vw,13px); color:#5F5E5A; white-space:nowrap; font-weight:600; min-width:2.5rem; text-align:right; }
+
+/* ── Streak ── */
+.streak {
+  text-align:center;
+  font-size:clamp(12px,3vw,14px);
+  color:#854F0B;
+  background:#FAEEDA;
+  border:1.5px solid var(--amber);
+  border-radius:var(--radius-pill);
+  padding:clamp(5px,1.5vw,7px) 20px;
+  margin-bottom:clamp(0.75rem,2vw,1rem);
+  font-weight:600;
+  display:none;
+}
+
+/* ── Question card ── */
+.q-card {
+  background:#fff;
+  border:1.5px solid var(--blue-border);
+  border-radius:var(--radius-lg);
+  padding:clamp(1.25rem,4vw,2rem) clamp(1rem,4vw,1.5rem);
+  margin-bottom:clamp(0.75rem,2vw,1rem);
+  box-shadow:0 3px 0 var(--blue-border);
+}
+.q-type-badge {
+  display:inline-block;
+  background:var(--blue-mid);
+  color:#fff;
+  font-size:clamp(10px,2.5vw,12px);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:clamp(4px,1vw,6px) clamp(12px,3vw,18px);
+  border-radius:var(--radius-pill);
+  margin-bottom:clamp(10px,3vw,16px);
+}
+.q-text {
+  font-size:clamp(20px,5.5vw,28px);
+  font-weight:700;
+  color:var(--blue-dark);
+  margin-bottom:6px;
+  line-height:1.25;
+}
+.q-hint {
+  font-size:clamp(13px,3vw,15px);
+  color:var(--blue-light);
+  margin-bottom:clamp(1rem,3vw,1.5rem);
+  font-weight:500;
+}
+
+/* ── Options ── */
+.options { display:flex; flex-direction:column; gap:clamp(8px,2vw,10px); }
+.opt {
+  background:var(--gray-bg);
+  border:2px solid var(--gray-border);
+  border-radius:clamp(10px,2.5vw,14px);
+  padding:clamp(12px,3vw,15px) clamp(14px,4vw,18px);
+  font-size:clamp(15px,4vw,17px);
+  color:var(--gray-text);
+  cursor:pointer;
+  text-align:left;
+  transition:all 0.15s;
+  font-family:inherit;
+  font-weight:500;
+  line-height:1.3;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.opt:hover:not(:disabled) { background:var(--blue-pale); border-color:var(--blue-light); color:var(--blue-dark); }
+.opt:active:not(:disabled) { transform:scale(0.98); }
+.opt.correct { background:var(--green-bg); border-color:var(--green-border); color:var(--green-text); font-weight:600; }
+.opt.wrong   { background:var(--red-bg);   border-color:var(--red-border);   color:var(--red-text); }
+.opt.reveal  { background:var(--blue-pale); border-color:var(--blue-light);  color:var(--blue-dark); font-weight:600; }
+
+/* ── Feedback ── */
+.feedback {
+  border-radius:clamp(10px,2.5vw,14px);
+  padding:clamp(11px,3vw,14px) clamp(14px,4vw,18px);
+  margin-top:clamp(0.75rem,2vw,1rem);
+  font-size:clamp(14px,3.5vw,16px);
+  font-weight:600;
+  line-height:1.5;
+}
+.feedback.correct { background:var(--green-bg); color:var(--green-text); border:1.5px solid var(--green-border); }
+.feedback.wrong   { background:var(--red-bg);   color:var(--red-text);   border:1.5px solid var(--red-border); }
+
+/* ── Next button ── */
+.next-btn {
+  width:100%;
+  margin-top:clamp(0.75rem,2vw,1rem);
+  background:var(--blue-mid);
+  color:#fff;
+  border:none;
+  border-radius:clamp(10px,2.5vw,14px);
+  padding:clamp(13px,3.5vw,16px);
+  font-size:clamp(15px,4vw,17px);
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all 0.15s;
+  letter-spacing:0.02em;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.next-btn:hover  { background:var(--blue-dark); }
+.next-btn:active { transform:scale(0.98); }
+
+/* ── Result ── */
+.result {
+  background:#fff;
+  border:1.5px solid var(--blue-border);
+  border-radius:var(--radius-lg);
+  padding:clamp(1.75rem,5vw,2.5rem) clamp(1rem,4vw,1.5rem) clamp(1.5rem,4vw,2rem);
+  text-align:center;
+  box-shadow:0 3px 0 var(--blue-border);
+}
+.result-stars  { font-size:clamp(28px,7vw,38px); letter-spacing:4px; margin-bottom:0.5rem; }
+.result-icon   { font-size:clamp(52px,14vw,68px); display:block; margin-bottom:0.6rem; }
+.result-title  { font-size:clamp(22px,6vw,30px); font-weight:800; color:var(--blue-dark); margin-bottom:10px; line-height:1.2; }
+.result-praise { font-size:clamp(14px,3.5vw,17px); color:var(--blue-mid); font-weight:500; margin-bottom:1.5rem; line-height:1.65; padding:0 clamp(0,2vw,0.5rem); }
+.result-score-box {
+  background:var(--blue-pale);
+  border:1.5px solid var(--blue-border);
+  border-radius:clamp(14px,3vw,18px);
+  padding:clamp(1rem,3vw,1.25rem) clamp(1.5rem,5vw,2.5rem);
+  margin:0 auto 1.25rem;
+  display:block;
+  width:fit-content;
+  max-width:100%;
+}
+.result-num  { font-size:clamp(44px,12vw,58px); font-weight:800; color:var(--blue-mid); line-height:1; }
+.result-pct  { font-size:clamp(13px,3.5vw,16px); color:var(--blue-light); margin-top:4px; font-weight:600; }
+.result-msg  { font-size:clamp(13px,3.5vw,16px); color:#444441; margin-bottom:1.75rem; line-height:1.7; padding:0 clamp(0,2vw,0.5rem); }
+.restart {
+  background:var(--blue-mid);
+  color:#fff;
+  border:none;
+  border-radius:clamp(10px,2.5vw,14px);
+  padding:clamp(13px,3.5vw,15px) 40px;
+  font-size:clamp(15px,4vw,17px);
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all 0.15s;
+  display:block;
+  width:100%;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.restart:hover  { background:var(--blue-dark); }
+.restart:active { transform:scale(0.98); }
+
+/* ── Tablet / desktop tweaks ── */
+@media (min-width:600px) {
+  .opt:hover:not(:disabled) { transform:translateX(4px); }
+  .next-btn:hover { transform:translateY(-1px); }
+  .restart:hover  { transform:translateY(-1px); }
+}
+
+/* ── Large screens: center nicely ── */
+@media (min-width:900px) {
+  body { display:flex; align-items:flex-start; justify-content:center; padding-top:2.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-header">
+    <img src="data:image/png;base64,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" alt="Gyakorlatias Angol">
+    <div class="sub">Beszédfordulatok kvíz</div>
+  </div>
+
+  <div class="score-bar">
+    <div class="side">
+      <div class="lbl">Pontszám</div>
+      <div class="val" id="score-display">0</div>
+    </div>
+    <div class="divider"></div>
+    <div class="side" style="text-align:right;">
+      <div class="lbl">Kérdés</div>
+      <div style="display:flex;align-items:baseline;gap:4px;justify-content:flex-end;">
+        <div class="val" id="q-num">1</div>
+        <div class="sub-val">/ 12</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prog-row">
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0%</div>
+  </div>
+
+  <div class="streak" id="streak-row">🔥 <span id="streak-count">0</span> helyes egymás után — szuper vagy!</div>
+
+  <div id="quiz-area"></div>
+</div>
+
+<script>
+const pairs = [
+  {en:"What's up?",        hu:"Mi újság? / Hogy vagy?",      wrong_en:["Hang on.","Take care.","No way!"],             wrong_hu:["Várj egy kicsit.","Nyugi. / Lazíts.","Vigyázz magadra!"]},
+  {en:"Hang on.",          hu:"Várj egy kicsit.",             wrong_en:["Come on!","Never mind.","Take it easy."],      wrong_hu:["Csak vicceltem.","Dehogy!","Rajtad múlik."]},
+  {en:"No way!",           hu:"Dehogy! / Nem hiszem el!",     wrong_en:["Guess what?","It's up to you.","Come on!"],    wrong_hu:["Mindegy.","Ugyan már!","Képzeld!"]},
+  {en:"Come on!",          hu:"Ugyan már! / Na gyere!",       wrong_en:["Never mind.","Take care.","How's it going?"],  wrong_hu:["Mindegy.","Ne törődj vele.","Hogy megy?"]},
+  {en:"Take it easy.",     hu:"Nyugi. / Lazíts.",             wrong_en:["It doesn't matter.","Hang on.","Guess what?"], wrong_hu:["Csak vicceltem.","Vigyázz magadra!","Rajtad múlik."]},
+  {en:"I'm just kidding.", hu:"Csak vicceltem.",              wrong_en:["It's up to you.","Take care.","What's up?"],   wrong_hu:["Képzeld!","Mindegy.","Ne törődj vele."]},
+  {en:"It doesn't matter.",hu:"Mindegy. / Nem számít.",       wrong_en:["Never mind.","Come on!","How's it going?"],    wrong_hu:["Várj egy kicsit.","Hogy megy?","Ugyan már!"]},
+  {en:"How's it going?",   hu:"Hogy megy? / Hogy vagy?",      wrong_en:["Take care.","Guess what?","No way!"],          wrong_hu:["Vigyázz magadra!","Rajtad múlik.","Csak vicceltem."]},
+  {en:"Take care.",        hu:"Vigyázz magadra!",             wrong_en:["Hang on.","Never mind.","It's up to you."],    wrong_hu:["Ne törődj vele.","Képzeld!","Dehogy!"]},
+  {en:"Never mind.",       hu:"Ne törődj vele. / Mindegy.",   wrong_en:["Take it easy.","What's up?","Come on!"],       wrong_hu:["Nyugi. / Lazíts.","Rajtad múlik.","Hogy megy?"]},
+  {en:"It's up to you.",   hu:"Rajtad múlik.",                wrong_en:["How's it going?","I'm just kidding.","Guess what?"],wrong_hu:["Képzeld!","Várj egy kicsit.","Csak vicceltem."]},
+  {en:"Guess what?",       hu:"Képzeld!",                     wrong_en:["Take care.","No way!","Hang on."],             wrong_hu:["Mindegy.","Vigyázz magadra!","Dehogy!"]},
+  {en:"My treat!",         hu:"Én fizetem!",                  wrong_en:["Good job!","No way!","Take care."],            wrong_hu:["Rajtad múlik.","Képzeld!","Csak vicceltem."]},
+  {en:"Good job!",         hu:"Szép munka! / Jól csináltad!", wrong_en:["My treat!","Come on!","Hang on."],             wrong_hu:["Én fizetem!","Ugyan már!","Várj egy kicsit."]},
+  {en:"Long time no see!", hu:"Rég láttalak!",                wrong_en:["What's up?","Take it easy.","Guess what?"],    wrong_hu:["Hogy megy?","Csak vicceltem.","Képzeld!"]},
+  {en:"Be careful!",       hu:"Légy óvatos!",                 wrong_en:["Take care.","Never mind.","Come on!"],         wrong_hu:["Vigyázz magadra!","Ne törődj vele.","Rajtad múlik."]},
+  {en:"That's amazing!",   hu:"Ez fantasztikus!",             wrong_en:["Good job!","No way!","My treat!"],             wrong_hu:["Szép munka!","Dehogy!","Én fizetem!"]},
+  {en:"I have no idea.",   hu:"Fogalmam sincs.",              wrong_en:["Never mind.","It doesn't matter.","Hang on."], wrong_hu:["Ne törődj vele.","Mindegy.","Várj egy kicsit."]},
+];
+
+const praise_correct = [
+  "Igen, pontosan! Nagyszerű! 🎉",
+  "Helyes! Látszik, hogy figyelsz! 👏",
+  "Bravó! Ezt tudtad! ⭐",
+  "Tökéletes! Így tovább! 💪",
+  "Igen! Egyre jobban megy! 🌟",
+  "Helyes! Büszke lehetsz magadra! 😊",
+  "Remek! Szuper vagy! 🏆",
+];
+const praise_streak = [
+  "🔥 {n} egymás után — te egy igazi sztár vagy!",
+  "🚀 {n} helyes! Senki sem állíthat meg!",
+  "⚡ {n} sorozat! Elképesztő tempó!",
+  "🌟 {n} egymás után — fantasztikus!",
+];
+const results = [
+  {min:100,icon:"🏆",title:"TÖKÉLETES EREDMÉNY!",stars:"⭐⭐⭐⭐⭐",
+   praise:"Hihetetlen! 12-ből 12 — ez nem véletlen, ez TUDÁS! Te már profi szinten beszélsz angolul! Büszke lehetsz magadra, komolyan!",
+   msg:"Osztd meg az eredményed! Hadd lássák mások, milyen keményen dolgoztál! 🎊"},
+  {min:80,icon:"🌟",title:"Fantasztikus teljesítmény!",stars:"⭐⭐⭐⭐",
+   praise:"Wow! Ez egy igazán kiemelkedő eredmény! Látszik rajtad a fejlődés, és ez büszkeséggel tölthet el!",
+   msg:"Még egy kis gyakorlás, és a 100% is meglesz! Már majdnem ott vagy! 💫"},
+  {min:60,icon:"👍",title:"Nagyon jól ment!",stars:"⭐⭐⭐",
+   praise:"Szuper munka! Rengeteg kifejezést ismersz már — ez komoly teljesítmény! Minden egyes kör közelebb visz a folyékony angol beszédhez!",
+   msg:"Próbáld meg még egyszer — biztosan jobb lesz! Te ezt meg tudod csinálni! 💪"},
+  {min:40,icon:"💪",title:"Jó haladás!",stars:"⭐⭐",
+   praise:"Ne csüggedj — tanulni azt jelenti, hogy néha hibázunk! Minden helyes válasz egy lépés előre, és te már sok lépést tettél ma!",
+   msg:"Még egy kör, és meglátod a különbséget! Az ismétlés a tudás anyja! 📚"},
+  {min:0,icon:"😊",title:"Csak bátran, ez az eleje!",stars:"⭐",
+   praise:"Minden nagy tudás kis lépésekkel kezdődik — és te ma megtettéd az első lépéseket! Ez már önmagában csodálatos!",
+   msg:"Játssz még egyszer — garantálom, hogy jobban fog menni! A lényeg, hogy ne add fel! 🌱"},
+];
+
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
+let questions,cur,score,streak,answered;
+
+function buildQuestions(){
+  return shuffle(pairs).slice(0,12).map(p=>{
+    const dir=Math.random()<0.5?'en2hu':'hu2en';
+    if(dir==='en2hu'){
+      const opts=shuffle([p.hu,...shuffle(p.wrong_hu).slice(0,3)]);
+      return {q:p.en,type:'en2hu',opts,ans:opts.indexOf(p.hu)};
+    }else{
+      const opts=shuffle([p.en,...shuffle(p.wrong_en).slice(0,3)]);
+      return {q:p.hu,type:'hu2en',opts,ans:opts.indexOf(p.en)};
+    }
+  });
+}
+
+function init(){questions=buildQuestions();cur=0;score=0;streak=0;answered=false;render();}
+
+function render(){
+  document.getElementById('score-display').textContent=score;
+  document.getElementById('q-num').textContent=Math.min(cur+1,questions.length);
+  const pct=Math.round(cur/questions.length*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=pct+'%';
+  const sr=document.getElementById('streak-row');
+  if(streak>=2){sr.style.display='block';document.getElementById('streak-count').textContent=streak;}
+  else sr.style.display='none';
+  if(cur>=questions.length){showResult();return;}
+  const q=questions[cur];
+  const badge=q.type==='en2hu'?'🇬🇧 Mit jelent angolul?':'Hogy mondják angolul?';
+  const hint=q.type==='en2hu'?'Válaszd ki a helyes magyar jelentést!':'Válaszd ki a helyes angol kifejezést!';
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="q-card">
+      <div class="q-type-badge">${badge}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-hint">${hint}</div>
+      <div class="options" id="opts"></div>
+      <div id="feedback"></div>
+    </div>
+    <button class="next-btn" id="next-btn" style="display:none" onclick="next()">${cur===questions.length-1?'Eredmény megtekintése ✨':'Következő kérdés →'}</button>
+  `;
+  const opts=document.getElementById('opts');
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';b.textContent=o;b.onclick=()=>answer(i);
+    opts.appendChild(b);
+  });
+}
+
+function answer(chosen){
+  if(answered)return;
+  answered=true;
+  const q=questions[cur];
+  const btns=document.querySelectorAll('.opt');
+  const fb=document.getElementById('feedback');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.ans].classList.add('correct');
+  if(chosen===q.ans){
+    score++;streak++;
+    document.getElementById('score-display').textContent=score;
+    if(streak>=2){
+      document.getElementById('streak-row').style.display='block';
+      document.getElementById('streak-count').textContent=streak;
+    }
+    fb.className='feedback correct';
+    fb.textContent=streak>=3
+      ? praise_streak[Math.floor(Math.random()*praise_streak.length)].replace('{n}',streak)
+      : praise_correct[Math.floor(Math.random()*praise_correct.length)];
+  }else{
+    streak=0;
+    btns[chosen].classList.add('wrong');
+    btns[q.ans].classList.add('reveal');
+    fb.className='feedback wrong';
+    fb.innerHTML='Nem ez volt — de ez is tanulás! ✨ A helyes válasz: <strong>'+q.opts[q.ans]+'</strong>';
+    document.getElementById('streak-row').style.display='none';
+  }
+  document.getElementById('next-btn').style.display='block';
+}
+
+function next(){cur++;answered=false;render();}
+
+function showResult(){
+  const pct=Math.round(score/questions.length*100);
+  const r=results.find(x=>pct>=x.min);
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="result">
+      <div class="result-stars">${r.stars}</div>
+      <span class="result-icon">${r.icon}</span>
+      <div class="result-title">${r.title}</div>
+      <div class="result-praise">${r.praise}</div>
+      <div class="result-score-box">
+        <div class="result-num">${score} / ${questions.length}</div>
+        <div class="result-pct">${pct}% helyes válasz</div>
+      </div>
+      <div class="result-msg">${r.msg}</div>
+      <button class="restart" onclick="init()">🔄 Újra játszom!</button>
+    </div>
+  `;
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-label').textContent='100%';
+  document.getElementById('q-num').textContent=questions.length;
+  document.getElementById('streak-row').style.display='none';
+}
+
+init();
+</script>
+</body>
+</html>
